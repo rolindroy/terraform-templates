@@ -13,3 +13,7 @@ variable "aws_region" {
 variable "vpc_network" {
   default = "10.0"
 }
+
+variable "ec2_ami" {
+  default = "ami-97785bed"
+}
