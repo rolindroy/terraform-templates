@@ -52,18 +52,50 @@ resource "aws_internet_gateway" "terrafom_gw" {
   }
 }
 
-## AWS Route Table
-resource "aws_route_table" "terraform_public_route" {
-	vpc_id = "${aws_vpc.terraform_vpc.id}"
+## Update Route Table
+resource "aws_default_route_table" "terraform_rt" {
+  default_route_table_id = "${aws_vpc.terraform_vpc.default_route_table_id}"
 
-	route {
-		cidr_block = "0.0.0.0/0"
-		gateway_id = "${aws_internet_gateway.terrafom_gw.id}"
-	}
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = "${aws_internet_gateway.terrafom_gw.id}"
+  }
+
+  tags {
+    Name = "terraform_default_rt"
+  }
 }
 
 ## AWS Public Subnet
 resource "aws_route_table_association" "terraform_public_subnet_1" {
 	subnet_id = "${aws_subnet.subnet_1.id}"
-	route_table_id = "${aws_route_table.terraform_public_route.id}"
+	route_table_id = "${aws_vpc.terraform_vpc.default_route_table_id}"
+}
+
+## AWS aws_security_group
+resource "aws_security_group" "terrafrom_sg_app" {
+  name        = "terraform_sg_app"
+  description = "Allow all egress traffic and ingress 22,80"
+  vpc_id      = "${aws_vpc.terraform_vpc.id}"
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    cidr_blocks     = ["0.0.0.0/0"]
+  }
 }
