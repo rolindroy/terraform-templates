@@ -103,11 +103,6 @@ resource "aws_instance" "web" {
   provisioner "local-exec" {
     command = "sleep 30 && echo \"[webserver]\n${aws_instance.web.public_ip} ansible_connection=ssh ansible_ssh_user=ec2-user ansible_ssh_private_key_file=../ssh-key/terraform-key.pem\" > inventory &&  ansible-playbook -i inventory aws-playbook.yml"
   }
-  // user_data = <<-EOF
-  //     #!/bin/bash
-  //     yum install httpd
-  //     systemctl start httpd &
-  //     EOF
   tags {
     Name = "terrafrom-app"
   }
