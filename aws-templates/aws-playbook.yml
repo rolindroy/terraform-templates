@@ -1,0 +1,16 @@
+---
+- hosts: webserver
+  become: sudo
+
+  tasks:
+  - name: install httpd
+    dnf: name=httpd state=installed
+
+  - name: install php and libs
+    dnf: name={{ item }} state=installed
+    with_items:
+      - php
+      
+  handlers:
+    - name: restart apache
+      service: name=httpd state=restarted
